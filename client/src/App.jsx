@@ -33,7 +33,7 @@ import FAQ from "./components/FAQ";
 import { FileText, Menu, X, LogOut } from "lucide-react";
 import DarkModeToggle from "./components/DarkModeToggle";
 import { useLoading } from "./context/LoadingContext.jsx";
-
+import Stats from "./components/Stats.jsx";
 
 
 // Dashboard Component - Main authenticated app
@@ -502,6 +502,7 @@ function App() {
             element={
               <>
                 <LandingPage user={user} setUser={setUser} />
+                <Stats />
                 <FAQ />
                 <Footer />
               </>
