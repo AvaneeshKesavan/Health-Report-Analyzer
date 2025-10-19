@@ -32,6 +32,7 @@ import { FileText, Menu, X, LogOut } from "lucide-react";
 import DarkModeToggle from "./components/DarkModeToggle";
 import { useLoading } from "./context/LoadingContext.jsx";
 import { ReportsList, ReportDetail } from "./components/ReportList";
+import Stats from "./components/Stats";
 
 function Dashboard({ user, setUser }) {
   const { t } = useTranslation();
