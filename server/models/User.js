@@ -65,7 +65,7 @@ userSchema.pre("save", async function (next) {
   try {
     // Use a consistent salt rounds value of 10
     const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, 10);
+  this.password = await bcrypt.hash(this.password, salt);
   console.log(`Password hashed for user ${this.email} (Google auth: ${this.googleAuth}, Password changed: ${this.passwordChanged})`);
   next();
 } catch (error) {

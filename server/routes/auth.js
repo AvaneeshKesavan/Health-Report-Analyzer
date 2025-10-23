@@ -138,14 +138,14 @@ router.post('/login', async (req, res) => {
       });
     }
     // Special handling for Google-authenticated users who have reset their password
-    console.log(`Login attempt for ${email}: Google Auth = ${user.googleAuth}, Password Changed = ${user.passwordChanged}`);
+    // console.log(`Login attempt for ${email}: Google Auth = ${user.googleAuth}, Password Changed = ${user.passwordChanged}`);
 
     // Special handling for Google-authenticated users who have reset their password
-    console.log(`Login attempt for ${email}: Google Auth = ${user.googleAuth}, Password Changed = ${user.passwordChanged}`);
+    // console.log(`Login attempt for ${email}: Google Auth = ${user.googleAuth}, Password Changed = ${user.passwordChanged}`);
 
     // Check password - log comparison details for debugging
     const isValidPassword = await bcrypt.compare(password, user.password);
-    console.log(`Login attempt for ${email}: Password validation result = ${isValidPassword}`);
+    // console.log(`Login attempt for ${email}: Password validation result = ${isValidPassword}`);
     
     if (!isValidPassword) {
       return res.status(400).json({
@@ -207,15 +207,7 @@ router.post("/forgot-password", async (req, res) => {
       }
     });
 
-    // Verify the connection configuration
-    transporter.verify(function(error, success) {
-      if (error) {
-        console.error("SMTP Verification Error:", error);
-      } else {
-        console.log("SMTP server is ready to take our messages");
-      }
-    });
-    // Verify the connection configuration
+    // Verify the connection configuration (single call)
     transporter.verify(function(error, success) {
       if (error) {
         console.error("SMTP Verification Error:", error);
@@ -255,12 +247,12 @@ router.post("/reset-password/:token", async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
-    //const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-    user.resetPasswordToken = null;
-    user.resetPasswordExpire = null;
-    user.passwordChanged = true;
-    await user.save();
+  // Set plain password and rely on model pre-save hook to hash it
+  user.password = password;
+  user.resetPasswordToken = null;
+  user.resetPasswordExpire = null;
+  user.passwordChanged = true;
+  await user.save();
     console.log(`Password reset successful for user: ${user.email}`);
     res.json({ message: "Password updated successfully" });
   } catch (err) {
@@ -302,66 +294,6 @@ router.get('/me', async (req, res) => {
     });
   }
 });
-// Google Authentication
-router.post('/google-auth', async (req, res) => {
-  try {
-    const { email, firstName, lastName } = req.body;
-    
-    if (!email) {
-      return res.status(400).json({
-        error: 'Email is required'
-      });
-    }
-
-    // Check if user exists
-    let user = await User.findOne({ email: email.toLowerCase() });
-    
-    // If user doesn't exist, create a new one
-    if (!user) {
-      const randomPassword = crypto.randomBytes(16).toString('hex');
-      const hashedPassword = await bcrypt.hash(randomPassword, 12);
-      
-      user = new User({
-        email: email.toLowerCase(),
-        firstName: firstName || 'Google',
-        lastName: lastName || 'User',
-        password: hashedPassword,
-        isActive: true,
-        googleAuth: true
-      });
-      
-      await user.save();
-    } else {
-      // Update user's name if it changed in Google
-      if (firstName && firstName !== user.firstName) {
-        user.firstName = firstName;
-      }
-      if (lastName && lastName !== user.lastName) {
-        user.lastName = lastName;
-      }
-      // Mark as Google authenticated if not already set
-      if (!user.googleAuth) {
-        user.googleAuth = true;
-      }
-      await user.save();
-    }
-
-    // Generate token
-    const token = generateToken(user._id);
-
-    res.json({
-      success: true,
-      message: 'Google authentication successful',
-      token,
-      user: user.toSafeObject()
-    });
-  } catch (error) {
-    console.error('Google auth failed', error.message);
-    res.status(500).json({
-      error: 'Failed to authenticate with Google'
-    });
-  }
-});
 
 // Google Authentication
 router.post('/google-auth', async (req, res) => {
@@ -379,17 +311,27 @@ router.post('/google-auth', async (req, res) => {
     
     // If user doesn't exist, create a new one
     if (!user) {
+      // const randomPassword = crypto.randomBytes(16).toString('hex');
+      // const hashedPassword = await bcrypt.hash(randomPassword, 12);
       const randomPassword = crypto.randomBytes(16).toString('hex');
-      const hashedPassword = await bcrypt.hash(randomPassword, 12);
-      
+
       user = new User({
         email: email.toLowerCase(),
         firstName: firstName || 'Google',
         lastName: lastName || 'User',
-        password: hashedPassword,
+        password: randomPassword, // model pre-save hash this
         isActive: true,
         googleAuth: true
       });
+      
+      // user = new User({
+      //   email: email.toLowerCase(),
+      //   firstName: firstName || 'Google',
+      //   lastName: lastName || 'User',
+      //   password: hashedPassword,
+      //   isActive: true,
+      //   googleAuth: true
+      // });
       
       await user.save();
     } else {

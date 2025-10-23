@@ -339,7 +339,7 @@ export const ReportDetail = ({ reportId, onBack }) => {
 
             <div style={{ marginTop: '30px', padding: '15px', backgroundColor: '#f9fafb', borderRadius: '4px', fontSize: '12px', color: '#6b7280' }}>
                 <p style={{ margin: '0' }}>
-                    Extraction Method: <strong>{report.extractionMethod}</strong> |
+                    {/* Extraction Method: <strong>{report.extractionMethod}</strong> | */}
                     Processed: {new Date(report.createdAt).toLocaleString()}
                     {report.geminiMetadata && ` | Confidence: ${(report.geminiMetadata.confidence * 100).toFixed(0)}%`}
                 </p>
