@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 export default defineConfig({
   plugins: [
@@ -8,12 +9,12 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate', // Automatically updates the service worker
       
-      // 3. Add the manifest configuration
+      // Add the manifest configuration
       manifest: {
         name: 'Health Report Analyzer',
         short_name: 'HealthAnalyzer',
         description: 'Upload and analyze your health reports.',
-        theme_color: '#ffffff', // Your app's theme color
+        theme_color: '#ffffff',
         background_color: '#ffffff',
         start_url: '/',
         scope: '/',
@@ -37,7 +38,8 @@ export default defineConfig({
           }
         ]
       }
-    })
+    }),
+    visualizer({ filename: 'dist/stats.html', open: false })
   ],
   server: {
     port: 3000,
