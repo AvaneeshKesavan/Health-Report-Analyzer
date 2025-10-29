@@ -16,6 +16,8 @@ import 'lenis/dist/lenis.css';
 
 import { LoadingProvider } from './context/LoadingContext.jsx';
 
+import { Analytics } from "@vercel/analytics/next"
+
 // Initialize Lenis smooth scrolling
 const lenis = new Lenis({
   duration: 1.2,
@@ -63,6 +65,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <Suspense fallback={<div style={{ padding: 20, textAlign: 'center' }}>Loading translations...</div>}>
       <LoadingProvider>
         <App />
+        <Analytics />
       </LoadingProvider>
     </Suspense>
   </React.StrictMode>,
