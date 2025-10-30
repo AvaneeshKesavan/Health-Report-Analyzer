@@ -16,7 +16,7 @@ import 'lenis/dist/lenis.css';
 
 import { LoadingProvider } from './context/LoadingContext.jsx';
 
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
 
 // Initialize Lenis smooth scrolling
 const lenis = new Lenis({

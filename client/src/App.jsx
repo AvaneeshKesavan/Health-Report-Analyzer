@@ -33,6 +33,7 @@ import DarkModeToggle from "./components/DarkModeToggle";
 import { useLoading } from "./context/LoadingContext.jsx";
 import { ReportsList, ReportDetail } from "./components/ReportList";
 import Stats from "./components/Stats";
+import AnalyticsTracker from './AnalyticsTracker';
 
 function Dashboard({ user, setUser }) {
   const { t } = useTranslation();
@@ -475,6 +476,7 @@ function App() {
 
   return (
     <Router>
+      <AnalyticsTracker />
       <RouteChangeTracker />
       <div className="app">
         <Routes>
