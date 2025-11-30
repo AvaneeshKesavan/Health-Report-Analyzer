@@ -42,17 +42,21 @@ export const updateAOSConfig = (config) => {
 };
 
 /**
- * Hook to detect low-performance devices and disable animations
+ * Hook to detect low-performance devices and simplify animations
  */
 export const checkPerformance = () => {
-  // Check if device is low-end (you can expand this logic)
-  const isLowEndDevice = () => {
-    return window.navigator.hardwareConcurrency < 4 || 
-           /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  };
+  // Check if device is mobile or low-end
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isLowEndDevice = window.navigator.hardwareConcurrency < 4;
   
-  if (isLowEndDevice()) {
-    updateAOSConfig({ disable: true });
+  // Simplify animations on mobile/low-end devices but don't disable completely
+  if (isMobile || isLowEndDevice) {
+    updateAOSConfig({ 
+      duration: 300,
+      once: true,
+      mirror: false,
+      offset: 50
+    });
   }
 };
 

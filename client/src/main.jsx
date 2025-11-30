@@ -18,55 +18,57 @@ import { LoadingProvider } from './context/LoadingContext.jsx';
 
 import { Analytics } from "@vercel/analytics/react";
 
-// Initialize Lenis smooth scrolling
-const lenis = new Lenis({
-  duration: 1.2,
-  easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-  orientation: 'vertical',
-  gestureOrientation: 'vertical',
-  smoothWheel: true,
-  wheelMultiplier: 1,
-  smoothTouch: false,
-  touchMultiplier: 2,
-  infinite: false,
-});
+// Detect if device is mobile
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
 
-// Request animation frame for Lenis
-function raf(time) {
-  lenis.raf(time);
+// Initialize Lenis smooth scrolling - DISABLED on mobile to prevent scrolling issues
+let lenis = null;
+if (!isMobile) {
+  lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    orientation: 'vertical',
+    gestureOrientation: 'vertical',
+    smoothWheel: true,
+    wheelMultiplier: 1,
+    smoothTouch: false,
+    touchMultiplier: 2,
+    infinite: false,
+  });
+
+  // Request animation frame for Lenis
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+
   requestAnimationFrame(raf);
+
+  // Integrate Lenis with AOS
+  lenis.on('scroll', () => {
+    AOS.refresh();
+  });
 }
 
-requestAnimationFrame(raf);
-
-// Integrate Lenis with AOS
-lenis.on('scroll', () => {
-  AOS.refresh();
-});
-
-// Initialize AOS with optimized settings
+// Initialize AOS with mobile-optimized settings
 AOS.init({
-  duration: 800,
-  once: false,
-  mirror: true,
-  offset: 100,
-  delay: 100,
-  easing: 'ease-in-out',
+  duration: isMobile ? 400 : 800, // Faster animations on mobile
+  once: true, // Only animate once to improve performance
+  mirror: false, // Don't repeat animations when scrolling back
+  offset: isMobile ? 50 : 100, // Smaller offset on mobile
+  delay: 0, // No delay on mobile
+  easing: 'ease-out',
   anchorPlacement: 'top-bottom',
-  // Disable animations on mobile devices with poor performance
-  disable: window.innerWidth < 768 && 'mobile',
-  // Update animations on window resize
+  disable: false, // Always enable AOS (but simplified on mobile)
   debounceDelay: 50,
   throttleDelay: 99,
 });
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Suspense fallback={<div style={{ padding: 20, textAlign: 'center' }}>Loading translations...</div>}>
-      <LoadingProvider>
-        <App />
-        <Analytics />
-      </LoadingProvider>
-    </Suspense>
+    <LoadingProvider>
+      <App />
+      <Analytics />
+    </LoadingProvider>
   </React.StrictMode>,
 );

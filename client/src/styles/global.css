@@ -6,8 +6,12 @@
 }
 
 html {
-  /* Disable default smooth scroll to let Lenis handle it */
-  scroll-behavior: auto;
+  /* Enable smooth scroll behavior for mobile, let Lenis handle desktop */
+  scroll-behavior: smooth;
+  /* Ensure mobile can scroll */
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* iOS momentum scrolling */
 }
 
 html.lenis,
@@ -29,6 +33,21 @@ html.lenis body {
 
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+/* Mobile-specific fixes */
+@media (max-width: 768px) {
+  html, body {
+    /* Force enable scrolling on mobile */
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
+  }
+  
+  html.lenis-smooth {
+    /* Disable Lenis class effects on mobile */
+    scroll-behavior: smooth !important;
+  }
 }
 
 body {

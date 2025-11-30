@@ -385,36 +385,43 @@ function RouteChangeTracker() {
 }
 
 function App() {
-  const { t, i18n } = useTranslation();
+  const { t, i18n, ready } = useTranslation();
   const { loading } = useLoading();
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
   // Initialize AOS for scroll animations with improved handling
   useEffect(() => {
-    // Check for low-performance devices and disable animations if needed
-    checkPerformance();
+    // Detect mobile to skip complex animations
+    const isMobile = window.innerWidth < 768;
+    
+    if (!isMobile) {
+      // Only check performance and add listeners on desktop
+      checkPerformance();
 
-    // Refresh animations on window resize with debounce for performance
-    const handleResize = () => {
+      // Refresh animations on window resize with debounce for performance
+      const handleResize = () => {
+        refreshAnimations();
+      };
+
+      window.addEventListener('resize', handleResize);
+      window.addEventListener('orientationchange', handleResize);
+
+      // Initial refresh
       refreshAnimations();
-    };
 
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('orientationchange', handleResize);
-
-    // Initial refresh
-    refreshAnimations();
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('orientationchange', handleResize);
-    };
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        window.removeEventListener('orientationchange', handleResize);
+      };
+    }
   }, []);
 
-  // Refresh animations on route change
+  // Refresh animations on route change (only on desktop)
   useEffect(() => {
-    refreshAnimations();
+    if (window.innerWidth >= 768) {
+      refreshAnimations();
+    }
   }, [window.location.pathname]);
 
   useEffect(() => {
@@ -463,12 +470,13 @@ function App() {
     setUser(userData);
   };
 
-  if (authLoading || loading) {
+  // Show loading screen if translations not ready or auth is loading
+  if (!ready || authLoading || loading) {
     return (
       <div className="app">
         <div className="global-loading-overlay">
           <LoadingSpinner />
-          <p>{t('app.loading')}</p>
+          <p>Loading...</p>
         </div>
       </div>
     );

@@ -47,7 +47,7 @@ i18n
     },
     
     react: {
-      useSuspense: true, // Enable suspense integration
+      useSuspense: false, // Disable suspense to prevent blank screens on mobile
       bindI18n: 'languageChanged',
       bindI18nStore: '',
       transEmptyNodeValue: '',
